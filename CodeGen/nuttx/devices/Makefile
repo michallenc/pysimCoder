@@ -41,6 +41,10 @@ ifeq ($(CONFIG_SENSORS_QENCODER),y)
 SRCALL += nuttxENC.c
 endif
 
+ifeq ($(CONFIG_SENSORS_DHTXX),y)
+SRCALL += nuttxDHTXX.c
+endif
+
 have_can =
 ifeq ($(CONFIG_CAN),y)
 	have_can = yes
