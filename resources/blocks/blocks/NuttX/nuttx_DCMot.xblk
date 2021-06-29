@@ -1,0 +1,1 @@
+{"lib": "NuttX", "name": "DC_motor", "ip": 1, "op": 0, "stin": 0, "stout": 0, "icon": "PWM", "params": "nuttx_DCMotBlk|Port:'/dev/pwm2'|PWM freq [Hz]:4000"}

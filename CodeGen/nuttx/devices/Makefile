@@ -22,7 +22,8 @@ include $(NUTTX_EXPORT)/.config
 SRCALL = $(wildcard $(COMMON_DIR)/common_dev/*.c)
 SRCALL += toFile.c \
 		   serialOut.c \
-		   UDPsocketTx.c
+		   UDPsocketTx.c \
+		   nuttx_DCMot.c
 
 ifeq ($(CONFIG_ADC),y)
 SRCALL += nuttx_Adc.c
