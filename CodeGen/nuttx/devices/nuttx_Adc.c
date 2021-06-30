@@ -37,13 +37,18 @@ static int fd;
 
 static void init(python_block *block)
 {
-  if(fd==0){
+  int * intPar = block->intPar;
+  int fd;
+
+  if(intPar[1]==0){
     fd = open(block->str, O_RDONLY);
     if(fd<0) {
       fprintf(stderr,"Error opening device: %s\n", block->str);
       exit(1);
     }
   }
+
+  intPar[1] = fd;
 }
 
 static void inout(python_block *block)
@@ -53,6 +58,7 @@ static void inout(python_block *block)
   double *y = block->y[0];
   int ret;
   int ch = intPar[0];
+  int fd = intPar[1];
   int readsize = NCHANNELS*sizeof(struct adc_msg_s);
   int nbytes;
   
