@@ -20,9 +20,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 #include <stdio.h>
 #include <stdlib.h>
 
-static double error_last = 0;
-static double integral_sum = 0;
-
 /****************************************************************************
  * Name: init
  *
@@ -57,9 +54,19 @@ static void inout(python_block *block)
   double min_val = realPar[3];
   double max_val = realPar[4];
   
+  double error_last = realPar[5];
+  double integral_sum = realPar[6];
+
   /* Set integral sum */
 
-  integral_sum += error * Ki;
+  if (Ki == 0)
+    {
+      integral_sum = 0;
+    }
+  else
+    {
+      integral_sum += error * Ki;
+    }
 
   /* Compute the output value */
 
@@ -75,10 +82,12 @@ static void inout(python_block *block)
     }
   else if (action < min_val)
     {
-      integral_sum = integral_sum - (action - min_val);
+      integral_sum = integral_sum - (-action + min_val);
       action = min_val;
     }
 
+  realPar[5] = error_last;
+  realPar[6] = integral_sum;
   y[0] = action;
 }
 

@@ -19,5 +19,5 @@ def discretePIDBlk(pin, pout, Kp, Ki, Kd, min_val, max_val):
 
     """
 
-    blk = RCPblk('discretePID', pin, pout, [0,0], 1, [Kp, Ki, Kd, min_val, max_val], [])
+    blk = RCPblk('discretePID', pin, pout, [0,0], 1, [Kp, Ki, Kd, min_val, max_val, 0, 0], [])
     return blk

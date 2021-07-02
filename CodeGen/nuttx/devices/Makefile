@@ -23,7 +23,8 @@ SRCALL = $(wildcard $(COMMON_DIR)/common_dev/*.c)
 SRCALL += toFile.c \
 		   serialOut.c \
 		   UDPsocketTx.c \
-		   nuttx_DCMot.c
+		   nuttx_DCMot.c \
+		   nuttx_TCPSend.c
 
 ifeq ($(CONFIG_ADC),y)
 SRCALL += nuttx_Adc.c
