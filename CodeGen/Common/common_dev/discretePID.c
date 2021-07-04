@@ -53,7 +53,6 @@ static void inout(python_block *block)
   double Kd = realPar[2];
   double min_val = realPar[3];
   double max_val = realPar[4];
-  
   double error_last = realPar[5];
   double integral_sum = realPar[6];
 

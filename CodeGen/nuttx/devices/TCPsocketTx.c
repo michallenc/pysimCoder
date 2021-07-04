@@ -1,5 +1,5 @@
 /*
-  COPYRIGHT (C) 2021  Roberto Bucher (roberto.bucher@supsi.ch)
+  COPYRIGHT (C) 2021 Roberto Bucher (roberto.bucher@supsi.ch)
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,90 +17,104 @@
 */
 
 #include <pyblock.h>
-#include <commonFun.h>
-#include <nuttx/config.h>
-#include <nuttx/arch.h>
-
-#include <sys/ioctl.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-
-#include <nuttx/analog/dac.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <math.h>
 
 /****************************************************************************
  * Name: init
  *
  * Description:
- *   Open the device and start reading task.
+ *   Connect the socket.
  *
  ****************************************************************************/
 
 static void init(python_block *block)
 {
-  int * intPar = block->intPar;
-  int fd = intPar[1];
+  int * intPar    = block->intPar;
+  struct sockaddr_in server;
+  socklen_t addrlen = sizeof(struct sockaddr_in);
 
-  if (fd == 0)
+  char * IPbuf;
+  struct hostent *he;
+
+  if ((he = gethostbyname(block->str)) == NULL) exit(1);
+  IPbuf =  inet_ntoa(*((struct in_addr*) he->h_addr_list[0]));
+
+  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0)
     {
-      fd = open(block->str, O_WRONLY | O_NONBLOCK);
-      if (fd < 0)
-        {
-          fprintf(stderr, "Error opening device: %s\n", block->str);
-          exit(1);
-        }
+      printf("client socket failure %d\n", errno);
+      exit(1);
     }
+  intPar[1] = sockfd;
 
-  intPar[1] = fd;
+  server.sin_family      = AF_INET;
+  server.sin_port        = htons(block->intPar[0]);
+  server.sin_addr.s_addr = inet_addr(IPbuf);
+
+  if (connect(sockfd, (struct sockaddr *) &server, addrlen) < 0)
+    {
+      printf("client: connect failure: %d\n", errno);
+      close(sockfd);
+      exit(1);
+    }
 }
 
 /****************************************************************************
  * Name: inout
  *
  * Description:
- *   Copy the data into the output signals.
+ *   Send data over TCP.
  *
  ****************************************************************************/
 
 static void inout(python_block *block)
 {
-  struct dac_msg_s msgs[1];
-  int ret;
+  int i;
   int * intPar = block->intPar;
-  double *u = block->u[0];
+  double *u;
+  double data[block->nin];
 
-  int data  = (int)u[0];
-  int channel = intPar[0];
-  int fd = intPar[1];
+  int s = intPar[1];
 
-  msgs[0].am_channel = channel;
-  msgs[0].am_data = data;
-
-  ret = write(fd, &msgs[0], sizeof(msgs));
-  if (ret != sizeof(*msgs))
+  for(i=0;i<block->nin;i++)
     {
-      fprintf(stderr, "write failed: ret=%d\n", ret);
+      u = block->u[i];
+      data[i] = u[0];
     }
 
+  send(s, data, sizeof(data) , 0);
 }
 
 /****************************************************************************
- * Name: end
+ * Name: init
  *
  * Description:
- *   Close the device.
+ *   Close the socket.
  *
  ****************************************************************************/
 
 static void end(python_block *block)
 {
-  close(fd);
+  int * intPar    = block->intPar;
+
+  close(intPar[1]);
 }
 
-void nuttx_DAC(int flag, python_block *block)
+/****************************************************************************
+ * Name: TCPsocketTx
+ *
+ * Description:
+ *   Call needed function based on input flag.
+ *
+ ****************************************************************************/
+
+void TCPsocketTx(int flag, python_block *block)
 {
   if (flag==CG_OUT){          /* get input */
     inout(block);
