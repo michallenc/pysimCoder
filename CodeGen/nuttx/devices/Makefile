@@ -25,7 +25,7 @@ SRCALL += toFile.c \
 		   nuttx_DCMot.c
 
 ifeq ($(CONFIG_ADC),y)
-SRCALL += nuttx_Adc.c
+SRCALL += nuttx_ADC.c
 endif
 
 ifeq ($(CONFIG_DAC),y)
