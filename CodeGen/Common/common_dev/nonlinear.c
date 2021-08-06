@@ -209,3 +209,22 @@ void rel(int Flag, python_block *block)
     break;
   }
 }
+
+void irc2degree(int Flag, python_block *block)
+{
+  double *y;
+  double *in1 = block->u[0];
+  y = (double *) block->y[0];
+
+  switch(Flag){
+  case CG_OUT:
+  case CG_INIT:
+  case CG_END:
+    {
+      double degree = 360 * in1[0];
+      y[0] = sin(block->intPar[0] + degree); 
+    }
+  default:
+    break;
+  }
+}

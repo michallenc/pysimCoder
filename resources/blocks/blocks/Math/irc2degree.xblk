@@ -1,0 +1,1 @@
+{"lib": "math", "name": "IRC2DEG", "ip": 1, "op": 1, "stin": 0, "stout": 0, "icon": "INVERSE_CLARKE", "params": "irc2degreeBlk|offset: 0", "help": "None\n"}
