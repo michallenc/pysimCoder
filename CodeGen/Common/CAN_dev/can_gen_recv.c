@@ -18,52 +18,46 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 
 #include <pyblock.h>
 
-#include <canopen.h>
+#include <candev.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static void init(python_block *block)
-{
-  if(canOpenTH(block->str)) exit(1);  
-  registerMsg(block->intPar[3], (uint16_t) block->intPar[1], (uint8_t) block->intPar[2]);
+static void init(python_block *block) {
+  if (can_device_open(0, block->str))
+    exit(1);
+  can_register_msg(block->intPar[3]);
 }
 
-static void inout(python_block *block)
-{
+static void inout(python_block *block) {
   uint8_t DATA[8];
   double *y;
-  
+
   uint16_t *index;
   uint8_t *subindex;
   uint32_t *data_index;
 
   DATA[0] = 0x40;
-  index = (uint16_t *) &DATA[1];
-  subindex = (uint8_t *) &DATA[3];
+  index = (uint16_t *)&DATA[1];
+  subindex = (uint8_t *)&DATA[3];
   *index = block->intPar[1];
   *subindex = block->intPar[2];
 
-  sendMsg(block->intPar[0],DATA,8);
+  uint64_t value = 0x11223344556677;
 
-  y =  block->y[0];
-  y[0] = block->realPar[0]*getValue(block->intPar[3], block->intPar[1], block->intPar[2]);
+  can_send_msg(block->intPar[0], 8, value);
+
+  y = block->y[0];
+  y[0] = 0;
 }
 
-static void end(python_block *block)
-{
-}
+static void end(python_block *block) {}
 
-void can_gen_recv(int flag, python_block *block)
-{
-  if (flag==CG_OUT){          /* get input */
+void can_gen_recv(int flag, python_block *block) {
+  if (flag == CG_OUT) { /* get input */
     inout(block);
-  }
-  else if (flag==CG_END){     /* termination */ 
+  } else if (flag == CG_END) { /* termination */
     end(block);
-  }
-  else if (flag ==CG_INIT){    /* initialisation */
+  } else if (flag == CG_INIT) { /* initialisation */
     init(block);
   }
 }
-
-

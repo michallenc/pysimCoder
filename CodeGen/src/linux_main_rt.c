@@ -13,10 +13,6 @@
 #include <sys/io.h>
 #endif
 
-#ifdef CANOPEN
-void canopen_synch(void);
-#endif
-
 #define XNAME(x,y)  x##y
 #define NAME(x,y)   XNAME(x,y)
 
@@ -104,9 +100,6 @@ static void *rt_task(void *p)
 
   NAME(MODEL,_init)();
   
-#ifdef CANOPEN
-  canopen_synch();
-#endif
   
   /* get current time */
   clock_gettime(CLOCK_MONOTONIC,&t_current);
@@ -117,10 +110,6 @@ static void *rt_task(void *p)
     /* periodic task */
     T = calcdiff(t_current,T0);
     NAME(MODEL,_isr)(T);
-
-#ifdef CANOPEN
-    canopen_synch();
-#endif
 
     if((FinalTime >0) && (T >= FinalTime)) break;
 
