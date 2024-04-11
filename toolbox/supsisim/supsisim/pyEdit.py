@@ -161,6 +161,11 @@ class NewEditorMainWindow(QMainWindow):
                                                 statusTip = 'Settings',
                                                 triggered = self.setcodegenAct)
 
+        self.setWDAction = QAction(QIcon(mypath+'shv.png'),
+                                                'Watch Dog',self,
+                                                statusTip = 'Watch Dog',
+                                                triggered = self.setWDAct)
+
         self.setSHVAction = QAction(QIcon(mypath+'shv.png'),
                                                 'SHV Support',self,
                                                 statusTip = 'SHV Support',
@@ -200,6 +205,7 @@ class NewEditorMainWindow(QMainWindow):
         toolbarS.addAction(self.runAction)
         toolbarS.addAction(self.codegenAction)
         toolbarS.addAction(self.setCodegenAction)
+        toolbarS.addAction(self.setWDAction)
         toolbarS.addAction(self.setSHVAction)
 
         toolbarP = self.addToolBar('Python')
@@ -242,6 +248,7 @@ class NewEditorMainWindow(QMainWindow):
 
         setMenu = menubar.addMenu('Se&ttings')
         setMenu.addAction(self.setCodegenAction)
+        setMenu.addAction(self.setWDAction)
 
         shvMenu = menubar.addMenu('&Communication')
         shvMenu.addAction(self.setSHVAction)
@@ -462,6 +469,9 @@ class NewEditorMainWindow(QMainWindow):
 
     def setcodegenAct(self):
         self.scene.codegenDlg()
+
+    def setWDAct(self):
+        self.scene.WDSetDlg()
 
     def setSHVAct(self):
         self.scene.SHVSetDlg()

@@ -4,7 +4,7 @@ from supsisim.block import Block
 from supsisim.subsblock import subsBlock
 from supsisim.port import Port, InPort, OutPort
 from supsisim.connection import Connection
-from supsisim.dialg import RTgenDlg, SHVDlg
+from supsisim.dialg import RTgenDlg, WDDlg, SHVDlg
 from supsisim.const import VERSION, pyrun, TEMP, respath, BWmin
 from lxml import etree
 import os
@@ -26,6 +26,10 @@ class GraphicsView(QGraphicsView):
     def wheelEvent(self, event):
         factor = 1.41 ** (-event.angleDelta().y() / 240.0)
         self.scale(factor, factor)
+
+class WDInstance:
+    def __init__(self):
+        self.CheckMath = False
 
 class SHVInstance:
     def __init__(self, filename):
@@ -55,6 +59,7 @@ class Scene(QGraphicsScene):
         self.Tf = '10'
         self.prio = ''
 
+        self.WD = WDInstance()
         self.SHV = SHVInstance(self.mainw.filename)
 
         self.undoList = []
@@ -388,6 +393,15 @@ class Scene(QGraphicsScene):
         self.prio =  str(dialog.prio.text())
         self.Tf = str(dialog.Tf.text())
 
+    def WDSetDlg(self):
+        dialog = WDDlg(self)
+        dialog.CheckMath.setChecked(self.WD.CheckMath)
+        res = dialog.exec()
+        if res != 1:
+            return
+
+        self.WD.CheckMath = dialog.CheckMath.isChecked()
+
     def SHVSetDlg(self):
         dialog = SHVDlg(self)
         dialog.SHVused.setChecked(self.SHV.used)
@@ -672,6 +686,9 @@ class Scene(QGraphicsScene):
         txt += 'for item in sysPath:\n'
         txt += '  blks[tmp].sysPath = item\n'
         txt += '  tmp += 1\n\n'  
+        fn.write(txt)
+
+        txt = 'os.environ["WD_CHECKMATH"] = \"' + str(self.WD.CheckMath) + '\"\n'
         fn.write(txt)
 
         txt =  'os.environ["SHV_USED"] = \"' + str(self.SHV.used) + '\"\n'

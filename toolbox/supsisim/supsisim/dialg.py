@@ -121,6 +121,30 @@ class RTgenDlg(QDialog):
         if len(fname) != 0:
             self.parscript.setText(fname)
 
+class WDDlg(QDialog):
+    def __init__(self, parent=None):
+        super(WDDlg, self).__init__(None)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.resize(300, 100)
+
+        lab1 = QLabel('Math errors')
+        self.CheckMath = QCheckBox('')
+        self.CheckMath.setChecked(False)
+
+        pbOK = QPushButton('OK')
+        pbCANCEL = QPushButton('CANCEL')
+        grid = QGridLayout()
+
+        grid.addWidget(lab1, 0, 0)
+        grid.addWidget(self.CheckMath, 0, 1)
+        grid.addWidget(pbOK, 1, 0)
+        grid.addWidget(pbCANCEL, 1, 1)
+
+        pbOK.clicked.connect(self.accept)
+        pbCANCEL.clicked.connect(self.reject)
+
+        self.setLayout(grid)
+
 class SHVDlg(QDialog):
     def __init__(self, parent=None):
         super(SHVDlg, self).__init__(None)

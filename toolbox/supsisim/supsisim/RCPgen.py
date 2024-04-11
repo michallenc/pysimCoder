@@ -13,7 +13,7 @@ The following commands are provided:
   genMake        - Generate the Makefile for the C code
   detBlkSeq      - Get the right block sequence for simulation and RT
   sch2blks       - Generate block list fron schematic
-  
+
 """
 from numpy import  nonzero, ones, mat, size, array, zeros
 from os import environ
@@ -61,9 +61,15 @@ def genCode(model, Tsamp, blocks, rkstep = 10):
     if size(Blocks) == 0:
         raise ValueError('No possible to determine the block sequence')
 
+    WDCheckMath = False
+    if environ["WD_CHECKMATH"] == "True":
+        WDCheckMath = True
+
     fn = model + '.c'
     f=open(fn,'w')
     strLn = "#include <pyblock.h>\n#include <stdio.h>\n#include <stdlib.h>\n\n"
+    if WDCheckMath:
+        strLn += "#include <fenv.h>\n#include <math.h>\n\n"
     f.write(strLn)
 
     N = size(Blocks)
@@ -77,7 +83,7 @@ def genCode(model, Tsamp, blocks, rkstep = 10):
     f.write("/* Function prototypes */\n\n")
 
     prototypes = []
-    
+
     for blk in Blocks:
         prototypes.append("void " + blk.fcn + "(int Flag, python_block *block);\n")
     setProto = set(prototypes)
@@ -246,6 +252,9 @@ def genCode(model, Tsamp, blocks, rkstep = 10):
         f.write("int i;\n")
         f.write("double h;\n\n")
 
+    if WDCheckMath:
+        f.write("  " + "feclearexcept(FE_ALL_EXCEPT);\n\n")
+
     for n in range(0,N):
         blk = Blocks[n]
         strLn = "  " + blk.fcn + "(CG_OUT, &block_" + model + "[" + str(n) + "]);\n"
@@ -284,6 +293,27 @@ def genCode(model, Tsamp, blocks, rkstep = 10):
                 f.write(strLn)
 
         f.write("  }\n")
+
+    if WDCheckMath:
+        txt  = "  int exceptions = 0;\n"
+        txt += "#ifdef FE_DIVBYZERO\n"
+        txt += "  exceptions |= FE_DIVBYZERO;\n"
+        txt += "#endif\n"
+        txt += "#ifdef FE_INEXACT\n"
+        txt += "  exceptions |= FE_INEXACT;\n"
+        txt += "#endif\n"
+        txt += "#ifdef FE_INVALID\n"
+        txt += "  exceptions |= FE_INVALID;\n"
+        txt += "#endif\n"
+        txt += "#ifdef FE_OVERFLOW\n"
+        txt += "  exceptions |= FE_OVERFLOW;\n"
+        txt += "#endif\n"
+        txt += "#ifdef FE_UNDERFLOW\n"
+        txt += "  exceptions |= FE_UNDERFLOW;\n"
+        txt += "#endif\n\n"
+        txt += "  int ret = fetestexcept(exceptions);\n"
+        txt += "  if (ret != 0) {\n    printf(\"Math error\\n\");\n  }\n"
+        f.write(txt)
 
     f.write("}\n")
 
@@ -353,7 +383,7 @@ def detBlkSeq(Nodes, blocks):
                 for node in block.pin:
                     if nodeL[node].block_in[0].uy == 1:
                         self.block_in.append(nodeL[node].block_in[0])
-  
+
 
         def __str__(self):
             txt  = 'Block: ' + self.block.fcn.__str__() + '\n'
