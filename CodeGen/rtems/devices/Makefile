@@ -9,6 +9,7 @@ COMMON_DIR = $(PYSUPSICTRL)/CodeGen/Common
 EXT_LIBS = $(PYSUPSICTRL)/ExtLibs
 
 RTEMS_MAKEFILE_PATH=/opt/rtems/6/arm-rtems6/xilinx_zynq_zedboard
+RTEMS_CAN_PATH=/home/michal/Michal/rtems/apps/rtems-canfd/lib/candrv
 
 ifndef RTEMS_MAKEFILE_PATH
 $(warning Specify RTEMS_MAKEFILE_PATH)
@@ -28,6 +29,7 @@ INCLUDE +=  -I$(GENERIC_INC) -I$(TARGET_INC)
 
 SRCALL = $(wildcard $(COMMON_DIR)/common_dev/*.c)
 SRCALL += $(wildcard $(COMMON_DIR)/posix/*.c)
+SRCALL += $(wildcard $(COMMON_DIR)/can/*.c)
 
 ifeq ($(SHV),1)
 EXT_SHV_LIB = $(EXT_LIBS)/libshv/libshvchainpack/c
@@ -39,14 +41,9 @@ SRCALL += $(EXT_LIBS)/ulut/ulut/ul_gsacust.c
 SRCALL += $(wildcard $(COMMON_DIR)/shv/*.c)
 endif
 
-SRCALL += test.c
-
-#ifdef have_can
-#SRCALL += canopen.c
-#SRCALL += $(wildcard $(COMMON_DIR)/CAN_dev/*.c)
-#SRCALL += $(wildcard $(COMMON_DIR)/Faulhaber_dev/*.c)
-#SRCALL += $(wildcard $(COMMON_DIR)/Maxon_dev/*.c)
-#endif
+SRCALL += can.c
+SRCALL += $(wildcard $(RTEMS_CAN_PATH)/*.c)
+SRCALL += $(wildcard $(RTEMS_CAN_PATH)/ctucanfd/*.c)
 
 OBJ = $(notdir $(SRCALL:.c=.o))
 
@@ -60,6 +57,7 @@ CC_FLAGS += -I$(COMMON_DIR)/shv/include
 CC_FLAGS += -I$(EXT_LIBS)/libshv/libshvchainpack/c/include
 CC_FLAGS += -I$(EXT_LIBS)/ulut
 endif
+CC_FLAGS += -I$(RTEMS_CAN_PATH)
 CC_FLAGS_SCP = -c $(DBG) $(INCLUDE) $(CFLAGS) $(DEFINES)
 
 dependencies:
@@ -123,6 +121,15 @@ endif
 	$(CC) $(CC_FLAGS) $<
 
 %.o: $(COMMON_DIR)/posix/%.c
+	$(CC) $(CC_FLAGS) $<
+
+%.o: $(COMMON_DIR)/can/%.c
+	$(CC) $(CC_FLAGS) $<
+
+%.o: $(RTEMS_CAN_PATH)/%.c
+	$(CC) $(CC_FLAGS) $<
+
+%.o: $(RTEMS_CAN_PATH)/ctucanfd/%.c
 	$(CC) $(CC_FLAGS) $<
 
 lib: $(OBJ)
