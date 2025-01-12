@@ -1,0 +1,11 @@
+{
+  "lib": "NuttX",
+  "name": "GPIO",
+  "ip": 1,
+  "op": 1,
+  "stin": 1,
+  "stout": 1,
+  "icon": "DI",
+  "params": "nuttx_gpio_blk|Port:'/dev/gpio0'",
+  "help": "This block can be used for both input and output GPIO pin. The number of block's inputs/outputs ports can be either 0 or 1. For output GPIO, input pin read is the value set on the output. It is possible to set output of the pin only if the pin is configured as output pin.\n\nParameters\nPort: device associated to the digital input\n\n"
+}

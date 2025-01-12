@@ -47,8 +47,7 @@ SRCALL += nuttx_PWM.c
 endif
 
 ifeq ($(CONFIG_DEV_GPIO),y)
-SRCALL += nuttxDI.c \
-nuttxDO.c
+SRCALL += nuttxDI.c nuttxDO.c nuttx_gpio.c
 endif
 
 ifeq ($(CONFIG_SENSORS_QENCODER),y)
