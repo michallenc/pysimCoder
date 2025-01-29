@@ -489,10 +489,10 @@ class NewEditorMainWindow(QMainWindow):
         return Scene(self)
 
     def closeEvent(self,event):          
-        try:
-            os.remove('tmp.py')
-        except:
-            pass
+        #try:
+        #    os.remove('tmp.py')
+        #except:
+        #    pass
             
         if self.modified and self.notSubsystem:
             ret = self.askSaving()

@@ -1,5 +1,5 @@
 from supsisim.RCPblk import RCPblk
-from numpy import size
+
 
 def printBlk(pin):
     """
@@ -16,6 +16,5 @@ def printBlk(pin):
 
     """
 
-    blk = RCPblk('print',pin,[],[0,0],1,[],[])
+    blk = RCPblk("print", pin, [], [0, 0], 1)
     return blk
-

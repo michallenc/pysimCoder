@@ -1,32 +1,25 @@
-
 from supsisim.RCPblk import RCPblk
 
+
 def TCPsocketAsyncBlk(*args):
-    if len(args) == 5:
-        pin, pout, IP, port, buffer = args
-    elif len(args) == 4:
-        pout = []
-        pin, IP, port, buffer = args
-
     """
-
     Call:   TCPsocketAsyncBlk(*args)
 
     Parameters
     ----------
        pin: connected input port(s)
        pout: connected output port(s)
-       IP : IP Addr
-       port :  Port
-       buffer : size of send buffer
+       params: block's parameters
 
     Returns
     -------
-       blk: RCPblk
-
+      Block's reprezentation RCPblk
     """
 
-    blk = RCPblk('TCPsocketAsync', pin, pout, [0,0], 1, [], [port, buffer, 0], IP)
-    return blk
+    if len(args) == 3:
+        pin, pout, params = args
+    elif len(args) == 2:
+        pout = []
+        pin, params = args
 
-
+    return RCPblk("TCPsocketAsync", pin, pout, [0, 0], 1, params)

@@ -1,24 +1,18 @@
+from supsisim.RCPblk import RCPblk, RcpParam
 
-from supsisim.RCPblk import RCPblk
-from numpy import size
 
-def ar2inoENCBlk(pout, channel, res, reset):
+def ar2inoENCBlk(pout: list[int], params: RcpParam) -> RCPblk:
     """
-
-    Call:   ar2inoENCBlk(pout, channel, res, reset)
+    Call:   ar2inoENCBlk(pout, params)
 
     Parameters
     ----------
        pout: connected output port(s)
-       channel : Encode no
-       res : Resolution
-       reset : Reset [0=no/1=yes]
+       params: block's parameters
 
     Returns
     -------
-       blk: RCPblk
-
+        Block's reprezentation RCPblk
     """
 
-    blk = RCPblk('ar2inoENC', [], pout, [0,0], 0, [], [channel, res, reset])
-    return blk
+    return RCPblk("ar2inoENC", [], pout, [0, 0], 0, params)
